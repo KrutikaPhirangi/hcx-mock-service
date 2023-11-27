@@ -2,6 +2,7 @@ package org.swasth.hcx.service;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.hl7.fhir.r4.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -143,7 +144,7 @@ public class BeneficiaryService {
                 Map<String, Object> responseMap = new HashMap<>();
                 String actionType = searchResultSet.getString("action");
                 if (actionType.equalsIgnoreCase("claim") || actionType.equalsIgnoreCase("preauth")) {
-                    responseMap.put("supportingDocuments", JSONUtils.deserialize(searchResultSet.getString("supporting_documents"), Map.class));
+                    responseMap.put("supportingDocuments", searchResultSet.getString("supporting_documents"));
                     responseMap.put("billAmount", searchResultSet.getString("bill_amount"));
                 }
                 responseMap.put("type", actionType);
@@ -193,7 +194,7 @@ public class BeneficiaryService {
                 Map<String, Object> responseMap = new HashMap<>();
                 String actionType = searchResultSet.getString("action");
                 if (actionType.equalsIgnoreCase("claim") || actionType.equalsIgnoreCase("preauth")) {
-                    responseMap.put("supportingDocuments", JSONUtils.deserialize(searchResultSet.getString("supporting_documents"), Map.class));
+                    responseMap.put("supportingDocuments", searchResultSet.getString("supporting_documents"));
                     responseMap.put("billAmount", searchResultSet.getString("bill_amount"));
                 }
                 responseMap.put("type", actionType);
@@ -246,7 +247,7 @@ public class BeneficiaryService {
                 responseMap.put("sender_code", searchResultSet.getString("sender_code"));
                 responseMap.put("recipient_code", searchResultSet.getString("recipient_code"));
                 responseMap.put("billAmount", searchResultSet.getString("bill_amount"));
-                responseMap.put("supportingDocuments", JSONUtils.deserialize(searchResultSet.getString("supporting_documents"), Map.class));
+                responseMap.put("supportingDocuments", searchResultSet.getString("supporting_documents"));
                 responseMap.put("mobile", searchResultSet.getString("mobile"));
                 responseMap.put("patientName", searchResultSet.getString("patient_name"));
                 entries.add(responseMap);
