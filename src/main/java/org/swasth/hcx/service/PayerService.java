@@ -2,8 +2,8 @@ package org.swasth.hcx.service;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
-import com.amazonaws.services.dynamodbv2.xspec.S;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.gson.Gson;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Claim;
 import org.hl7.fhir.r4.model.Coverage;
@@ -13,10 +13,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.swasth.hcx.dto.Request;
 import org.swasth.hcx.exception.ClientException;
-import org.swasth.hcx.utils.Constants;
 import org.swasth.hcx.utils.JSONUtils;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 
 import static org.swasth.hcx.utils.Constants.PENDING;
@@ -41,8 +39,10 @@ public class PayerService {
             getDocuments = getSupportingDocuments(reqFhirObj);
             amount = getAmount(reqFhirObj);
         }
+        Gson gson = new Gson();
+        String supportingDocuments = gson.toJson(getDocuments);
         String query = String.format("INSERT INTO %s (request_id,sender_code,recipient_code,action,raw_payload,request_fhir,response_fhir,status,additional_info,created_on,updated_on,correlation_id,mobile,otp_verification,workflow_id,account_number,ifsc_code,bank_details,app,supporting_documents,bill_amount,insurance_id,patient_name) VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s',%d,%d,'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s');",
-                table, request.getApiCallId(), request.getSenderCode(), request.getRecipientCode(), getEntity(request.getAction()), request.getPayload().getOrDefault("payload", ""), reqFhirObj, respFhirObj, PENDING, JSONUtils.serialize(info), System.currentTimeMillis(), System.currentTimeMillis(), request.getCorrelationId(), "", PENDING, request.getWorkflowId(), "1234", "1234", PENDING, "", getDocuments, amount, getInsuranceId(reqFhirObj), getPatientName(reqFhirObj));
+                table, request.getApiCallId(), request.getSenderCode(), request.getRecipientCode(), getEntity(request.getAction()), request.getPayload().getOrDefault("payload", ""), reqFhirObj, respFhirObj, PENDING, JSONUtils.serialize(info), System.currentTimeMillis(), System.currentTimeMillis(), request.getCorrelationId(), "", PENDING, request.getWorkflowId(), "1234", "1234", PENDING, "", supportingDocuments, amount, getInsuranceId(reqFhirObj), getPatientName(reqFhirObj));
         postgres.execute(query);
     }
 
