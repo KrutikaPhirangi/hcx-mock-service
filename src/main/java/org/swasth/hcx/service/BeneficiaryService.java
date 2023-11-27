@@ -2,9 +2,7 @@ package org.swasth.hcx.service;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hl7.fhir.r4.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -130,12 +128,6 @@ public class BeneficiaryService {
         payloadMap.put("workflow_id", resultSet.getString("workflow_id"));
         return payloadMap;
     }
-    private Map<String, List<String>> deserializeDocuments(String documentName) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, List<String>> jsonData = mapper.readValue(documentName, new TypeReference<>() {
-        });
-        return jsonData;
-    }
 
     public ResponseEntity<Object> getRequestListFromDatabase(Map<String, Object> requestBody) throws Exception {
         String mobile = (String) requestBody.getOrDefault("mobile", "");
@@ -152,7 +144,7 @@ public class BeneficiaryService {
                 Map<String, Object> responseMap = new HashMap<>();
                 String actionType = searchResultSet.getString("action");
                 if (actionType.equalsIgnoreCase("claim") || actionType.equalsIgnoreCase("preauth")) {
-                    responseMap.put("supportingDocuments", deserializeDocuments(searchResultSet.getString("supporting_documents")));
+                    responseMap.put("supportingDocuments", JSONUtils.deserialize(searchResultSet.getString("supporting_documents"),TypeReference.class));
                     responseMap.put("billAmount", searchResultSet.getString("bill_amount"));
                 }
                 responseMap.put("type", actionType);
@@ -202,7 +194,7 @@ public class BeneficiaryService {
                 Map<String, Object> responseMap = new HashMap<>();
                 String actionType = searchResultSet.getString("action");
                 if (actionType.equalsIgnoreCase("claim") || actionType.equalsIgnoreCase("preauth")) {
-                    responseMap.put("supportingDocuments", deserializeDocuments(searchResultSet.getString("supporting_documents")));
+                    responseMap.put("supportingDocuments", JSONUtils.deserialize(searchResultSet.getString("supporting_documents"), TypeReference.class));
                     responseMap.put("billAmount", searchResultSet.getString("bill_amount"));
                 }
                 responseMap.put("type", actionType);
@@ -255,7 +247,7 @@ public class BeneficiaryService {
                 responseMap.put("sender_code", searchResultSet.getString("sender_code"));
                 responseMap.put("recipient_code", searchResultSet.getString("recipient_code"));
                 responseMap.put("billAmount", searchResultSet.getString("bill_amount"));
-                responseMap.put("supportingDocuments", deserializeDocuments(searchResultSet.getString("supporting_documents")));
+                responseMap.put("supportingDocuments", JSONUtils.deserialize(searchResultSet.getString("supporting_documents"), TypeReference.class));
                 responseMap.put("mobile", searchResultSet.getString("mobile"));
                 responseMap.put("patientName", searchResultSet.getString("patient_name"));
                 entries.add(responseMap);
