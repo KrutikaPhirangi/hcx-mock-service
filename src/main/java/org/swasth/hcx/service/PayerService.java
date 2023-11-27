@@ -42,8 +42,7 @@ public class PayerService {
             getDocuments = getSupportingDocuments(reqFhirObj);
             amount = getAmount(reqFhirObj);
         }
-        ObjectMapper objectMapper = new ObjectMapper();
-        String getDocumentsJson = objectMapper.writeValueAsString(getDocuments);
+        String getDocumentsJson = JSONUtils.serialize(getDocuments);
         System.out.println(getDocumentsJson);
         String query = String.format("INSERT INTO %s (request_id,sender_code,recipient_code,action,raw_payload,request_fhir,response_fhir,status,additional_info,created_on,updated_on,correlation_id,mobile,otp_verification,workflow_id,account_number,ifsc_code,bank_details,app,supporting_documents,bill_amount,insurance_id,patient_name) VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s',%d,%d,'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s');",
                 table, request.getApiCallId(), request.getSenderCode(), request.getRecipientCode(), getEntity(request.getAction()), request.getPayload().getOrDefault("payload", ""), reqFhirObj, respFhirObj, PENDING, JSONUtils.serialize(info), System.currentTimeMillis(), System.currentTimeMillis(), request.getCorrelationId(), "", PENDING, request.getWorkflowId(), "1234", "1234", PENDING, "", getDocumentsJson, amount, getInsuranceId(reqFhirObj), getPatientName(reqFhirObj));
